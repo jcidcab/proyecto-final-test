@@ -23,7 +23,6 @@ test.describe('Módulo de Clientes - Perfil Admin', () => {
   });
 
   test('Permite visualizar el listado de clientes correctamente', async ({ page }) => {
-   
     await page.goto('https://imcoarca.leonardojose.dev/clientes');
     await expect(clientePage.tituloListado).toBeVisible();
   });
@@ -58,5 +57,82 @@ test.describe('Módulo de Clientes - Perfil Admin', () => {
 
     await clientePage.errorNombreRequerido.scrollIntoViewIfNeeded();
     await expect(clientePage.errorNombreRequerido).toBeVisible();
+  });
+
+  test('Permite crear cliente exitosamente dejando la dirección en blanco', async () => {
+    await clientePage.rellenarFormulario({ 
+      cuit: '20-23444555-4', 
+      razonSocial: 'Cliente Sin Direccion',
+      direccion: '' 
+    });
+    await clientePage.guardarCliente();
+
+    await expect(clientePage.alertaExito).toBeVisible();
+  });
+
+  test('Permite crear cliente exitosamente dejando el código postal en blanco', async () => {
+    await clientePage.rellenarFormulario({ 
+      cuit: '20-23444555-4', 
+      razonSocial: 'Cliente Sin CP',
+      codigoPostal: '' 
+    });
+    await clientePage.guardarCliente();
+
+    await expect(clientePage.alertaExito).toBeVisible();
+  });
+
+  test('Permite crear cliente exitosamente dejando la ciudad en blanco', async () => {
+    await clientePage.rellenarFormulario({ 
+      cuit: '20-23444555-4', 
+      razonSocial: 'Cliente Sin Ciudad',
+      ciudad: '' 
+    });
+    await clientePage.guardarCliente();
+
+    await expect(clientePage.alertaExito).toBeVisible();
+  });
+
+  test('Permite crear cliente exitosamente dejando el teléfono en blanco', async () => {
+    await clientePage.rellenarFormulario({ 
+      cuit: '20-23444555-4', 
+      razonSocial: 'Cliente Sin Telefono',
+      telefono: '' 
+    });
+    await clientePage.guardarCliente();
+
+    await expect(clientePage.alertaExito).toBeVisible();
+  });
+
+  test('Permite crear cliente exitosamente dejando el email en blanco', async () => {
+    await clientePage.rellenarFormulario({ 
+      cuit: '20-23444555-4', 
+      razonSocial: 'Cliente Sin Email',
+      email: '' 
+    });
+    await clientePage.guardarCliente();
+
+    await expect(clientePage.alertaExito).toBeVisible();
+  });
+
+  test('Permite crear cliente exitosamente dejando el WhatsApp en blanco', async () => {
+    await clientePage.rellenarFormulario({ 
+      cuit: '20-23444555-4', 
+      razonSocial: 'Cliente Sin Wp',
+      whatsapp: '' 
+    });
+    await clientePage.guardarCliente();
+
+    await expect(clientePage.alertaExito).toBeVisible();
+  });
+
+  test('Muestra un mensaje de error si se intenta crear un cliente que ya existe', async () => {
+    await clientePage.rellenarFormulario({ 
+      cuit: '34-20268959-2', 
+      razonSocial: 'Empresa SAZZZX' 
+    });
+    await clientePage.guardarCliente();
+
+    await clientePage.errorClienteExiste.scrollIntoViewIfNeeded();
+    await expect(clientePage.errorClienteExiste).toBeVisible();
   });
 });
