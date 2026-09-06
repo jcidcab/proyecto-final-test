@@ -1,0 +1,33 @@
+info:
+  name: Login Vendedor
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{base_url}}/login"
+  body:
+    type: json
+    data: |-
+      {
+        "email": "{{email_vendedor}}",
+        "password": "{{pass_vendedor}}"
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        const token = res.body.access_token;
+        if (token) {
+          bru.setEnvVar("token", token);
+          console.log("Token actualizado a Vendedor:", token.substring(0, 10) + "...");
+        }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

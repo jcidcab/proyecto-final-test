@@ -1,0 +1,51 @@
+info:
+  name: Crear Cliente
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: "{{base_url}}/clients"
+  headers:
+    - name: Authorization
+      value: Bearer {{token}}
+    - name: Accept
+      value: application/json
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "name": "Cliente Prueba TAE",
+        "cuit": "20123456789",
+        "email": "cliente.prueba@testing.com",
+        "phone": "+56912345678",
+        "tax": "I",
+        "retieniva": true
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        const id = res.body.id || res.body.data?.id;
+        if (id) {
+          bru.setEnvVar("client_id", id);
+          bru.setVar("client_id", id);
+          console.log("ID capturado con éxito:", id);
+        } else {
+          console.log("No se pudo obtener el ID del body:", res.body);
+        }
+  assertions:
+    - expression: res.status
+      operator: eq
+      value: "201"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
