@@ -1,17 +1,17 @@
 import { test, expect } from '@playwright/test';
-import { LoginPerfilAdminPage } from '../pages/Login.perfilAdminPage.js';
-import { ClientePerfilAdminPage } from '../pages/Cliente.perfilAdminPage.js';
+import { LoginPerfilVendedorPage } from '../pages/Login.perfilVendedorPage.js';
+import { ClientePerfilVendedorPage } from '../pages/Cliente.perfilVendedorPage.js';
 
-test.describe('Módulo de Clientes - Perfil Admin', () => {
+test.describe('Módulo de Clientes - Perfil Vendedor', () => {
   let loginPage;
   let clientePage;
 
   test.beforeEach(async ({ page }) => {
-    loginPage = new LoginPerfilAdminPage(page);
-    clientePage = new ClientePerfilAdminPage(page);
+    loginPage = new LoginPerfilVendedorPage(page);
+    clientePage = new ClientePerfilVendedorPage(page);
 
     await loginPage.abrirPagina();
-    await loginPage.iniciarSesion('tae@testing.com', 'Tae@2026');
+    await loginPage.iniciarSesion('vendedor@testing.com', 'Tae@2026');
     await expect(page).toHaveURL('https://imcoarca.leonardojose.dev/dashboard');
 
     await clientePage.navegarAClientes();
@@ -22,12 +22,12 @@ test.describe('Módulo de Clientes - Perfil Admin', () => {
     await expect(clientePage.tituloCrearCliente).toBeVisible();
   });
 
-  test('Entrar a clientes', async ({ page }) => {
+  test('Permite visualizar el listado de clientes correctamente', async ({ page }) => {
     await page.goto('https://imcoarca.leonardojose.dev/clientes');
     await expect(clientePage.tituloListado).toBeVisible();
   });
 
-  test('Crear cliente de forma exitosa', async () => {
+  test('Permite crear un cliente exitosamente con datos válidos', async () => {
     await clientePage.rellenarFormulario({ 
       cuit: '20-23444555-4', 
       razonSocial: 'Empresa Valida S.A.' 
@@ -37,7 +37,7 @@ test.describe('Módulo de Clientes - Perfil Admin', () => {
     await expect(clientePage.alertaExito).toBeVisible();
   });
 
-  test('Registrar con CUIT erróneo', async () => {
+  test('Muestra error de formato al registrar un CUIT erróneo', async () => {
     await clientePage.rellenarFormulario({ 
       cuit: '11-1', 
       razonSocial: 'Cliente Cuit Inválido' 
@@ -48,7 +48,7 @@ test.describe('Módulo de Clientes - Perfil Admin', () => {
     await expect(clientePage.errorCuit).toBeVisible();
   });
 
-  test('Registrar sin nombre o Razón social', async () => {
+  test('Muestra error de campo requerido al intentar guardar sin nombre o razón social', async () => {
     await clientePage.rellenarFormulario({ 
       cuit: '20-23444555-4', 
       razonSocial: '' 
@@ -59,7 +59,7 @@ test.describe('Módulo de Clientes - Perfil Admin', () => {
     await expect(clientePage.errorNombreRequerido).toBeVisible();
   });
 
-  test('Crear sin direccion de cliente', async () => {
+  test('Permite crear cliente exitosamente dejando la dirección en blanco', async () => {
     await clientePage.rellenarFormulario({ 
       cuit: '20-23444555-4', 
       razonSocial: 'Cliente Sin Direccion',
@@ -70,7 +70,7 @@ test.describe('Módulo de Clientes - Perfil Admin', () => {
     await expect(clientePage.alertaExito).toBeVisible();
   });
 
-  test('Crear sin direccion postal de cliente', async () => {
+  test('Permite crear cliente exitosamente dejando el código postal en blanco', async () => {
     await clientePage.rellenarFormulario({ 
       cuit: '20-23444555-4', 
       razonSocial: 'Cliente Sin CP',
@@ -81,7 +81,7 @@ test.describe('Módulo de Clientes - Perfil Admin', () => {
     await expect(clientePage.alertaExito).toBeVisible();
   });
 
-  test('Crear sin ciudad de cliente', async () => {
+  test('Permite crear cliente exitosamente dejando la ciudad en blanco', async () => {
     await clientePage.rellenarFormulario({ 
       cuit: '20-23444555-4', 
       razonSocial: 'Cliente Sin Ciudad',
@@ -92,7 +92,7 @@ test.describe('Módulo de Clientes - Perfil Admin', () => {
     await expect(clientePage.alertaExito).toBeVisible();
   });
 
-  test('Crear sin telefono direccion de cliente', async () => {
+  test('Permite crear cliente exitosamente dejando el teléfono en blanco', async () => {
     await clientePage.rellenarFormulario({ 
       cuit: '20-23444555-4', 
       razonSocial: 'Cliente Sin Telefono',
@@ -103,7 +103,7 @@ test.describe('Módulo de Clientes - Perfil Admin', () => {
     await expect(clientePage.alertaExito).toBeVisible();
   });
 
-  test('Crear sin sin email de cliente', async () => {
+  test('Permite crear cliente exitosamente dejando el email en blanco', async () => {
     await clientePage.rellenarFormulario({ 
       cuit: '20-23444555-4', 
       razonSocial: 'Cliente Sin Email',
@@ -114,7 +114,7 @@ test.describe('Módulo de Clientes - Perfil Admin', () => {
     await expect(clientePage.alertaExito).toBeVisible();
   });
 
-  test('Crear sin wsp de cliente', async () => {
+  test('Permite crear cliente exitosamente dejando el WhatsApp en blanco', async () => {
     await clientePage.rellenarFormulario({ 
       cuit: '20-23444555-4', 
       razonSocial: 'Cliente Sin Wp',
