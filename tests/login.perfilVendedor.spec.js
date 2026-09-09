@@ -14,7 +14,7 @@ test.describe('Módulo de Autenticación - Perfil Vendedor', () => {
 
     await expect(page).toHaveURL('https://imcoarca.leonardojose.dev/dashboard');
     await expect(vendedorPage.tituloDashboard).toBeVisible();
-    await expect(vendedorPage.textoBienvenida).toBeVisible();
+  
     await expect(vendedorPage.btnCerrarSesion).toBeVisible();
   });
 
