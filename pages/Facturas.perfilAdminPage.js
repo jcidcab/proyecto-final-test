@@ -1,50 +1,108 @@
+import { expect } from '@playwright/test';
+
 export class FacturasPerfilAdminPage {
   constructor(page) {
     this.page = page;
     
-    // Navegación del menú lateral
-    this.btnGestionClientes = page.locator('aside nav button, aside div button').nth(1);
-    this.subMenuItemFacturasVenta = page.getByRole('link', { name: 'Facturas de Venta' });
+    // Navegación del menú
+    this.btnMenuModulo = page.locator('a.flex.items-center.p-2.rounded-md.transition-colors.duration-200.justify-center.bg-indigo-600').first();
+    this.btnGestionClientes = page.locator('span.flex-1.ml-4.text-left', { hasText: 'Gestión de Clientes' });
+    this.subMenuItemFacturasVenta = page.locator('span', { hasText: 'Facturas de Venta' });
     
-    // Validaciones de la vista
-    this.tituloListado = page.getByRole('heading', { name: 'Listado de Facturas de Venta' });
+    // Acciones de creación
+    this.btnCrearFacturaVenta = page.getByRole('button', { name: 'Crear Factura de Venta' });
     
-    // Filtros de Fecha
-    this.inputDesde = page.locator('input[type="date"]').first();
-    this.inputHasta = page.locator('input[type="date"]').nth(1);
+    // Selectores para Cliente
+    this.btnLupaCliente = page.locator('div').filter({ hasText: /^Cliente \(\*\)/ }).locator('button');
+    this.modalBuscarCliente = page.locator('text=Buscar Cliente');
+    this.inputCodigoCliente = page.locator('div').filter({ hasText: /^Cliente \(\*\)/ }).locator('input').first();
 
-    // Creación
-    this.btnCrearFactura = page.getByRole('button', { name: 'Crear Factura de Venta' });
-    this.tituloCrearFactura = page.getByRole('heading', { name: 'Crear Nueva Factura de Venta' });
-    this.btnGuardarCambios = page.getByRole('button', { name: 'Guardar Cambios' });
-    this.alertaExito = page.locator('text=Factura guardada con éxito!');
+    // Selectores para Vendedor
+    this.btnLupaVendedor = page.locator('div').filter({ hasText: /^Vendedor/ }).locator('button');
+    this.modalBuscarVendedor = page.locator('text=Buscar Vendedor');
+    this.inputCodigoVendedor = page.locator('div').filter({ hasText: /^Vendedor/ }).locator('input').first();
+
+    // Selectores para Moneda
+    this.btnLupaMoneda = page.locator('div').filter({ hasText: /^Moneda/ }).locator('button');
+    this.modalBuscarMoneda = page.locator('text=Buscar Moneda');
+    this.inputCodigoMoneda = page.locator('div').filter({ hasText: /^Moneda/ }).locator('input').first();
+
+    
+   // Selector para el desplegable de Dirección de Entrega y campo de texto personalizado
+    this.selectDireccionEntrega = page.locator('[name="delivery_address_selector"]');
+    this.inputOtraDireccion = page.getByRole('textbox', { name: /Ingrese la nueva dirección de entrega/i });
+
+    // Selectores para Ítems de la Factura
+    this.btnAgregarItem = page.getByRole('button', { name: 'Agregar ítem' });
+    this.btnLupaArticulo = page.locator('tr').last().locator('button[aria-label="Buscar"]');
+    this.modalBuscarArticulo = page.locator('text=Buscar Artículo');
+    this.inputCodigoArticulo = page.locator('tr').last().locator('input').first();
+
+    // Selector para el botón de guardar factura
+    this.btnGuardarFactura = page.getByRole('button', { name: /Guardar Factura/i });
+    this.mensajeExito = page.getByText('Factura creada con éxito.', { exact: true });
   }
 
   async navegarAFacturasDeVenta() {
-    await this.btnGestionClientes.waitFor({ state: 'visible' });
+    await this.btnMenuModulo.click();
     await this.btnGestionClientes.click();
-    await this.subMenuItemFacturasVenta.waitFor({ state: 'visible' });
+    await this.subMenuItemFacturasVenta.waitFor({ state: 'visible', timeout: 10000 });
     await this.subMenuItemFacturasVenta.click();
   }
 
-  async filtrarPorFechas(desde, hasta) {
-    if (desde) {
-      await this.inputDesde.click();
-      await this.inputDesde.fill(desde);
-    }
-    if (hasta) {
-      await this.inputHasta.click();
-      await this.inputHasta.fill(hasta);
-    }
+  async abrirModalCrearFactura() {
+    await this.btnCrearFacturaVenta.click();
+    await this.page.waitForURL(/.*\/facturas-de-venta\/nuevo/);
   }
 
-  async irACrearFactura() {
-    await this.btnCrearFactura.waitFor({ state: 'visible' });
-    await this.btnCrearFactura.click();
+  async seleccionarClientePorNombre(nombreCliente) {
+    await this.btnLupaCliente.click();
+    await this.modalBuscarCliente.waitFor({ state: 'visible' });
+    
+    await this.page.getByRole('cell', { name: nombreCliente }).click();
+    await this.modalBuscarCliente.waitFor({ state: 'hidden' });
+    
+    await expect(this.inputCodigoCliente).not.toHaveValue('');
   }
 
-  async guardarFactura() {
-    await this.btnGuardarCambios.scrollIntoViewIfNeeded();
-    await this.btnGuardarCambios.click();
+  async seleccionarVendedorPorNombre(nombreVendedor) {
+    await this.btnLupaVendedor.click();
+    await this.modalBuscarVendedor.waitFor({ state: 'visible' });
+    
+    await this.page.getByRole('cell', { name: nombreVendedor }).click();
+    await this.modalBuscarVendedor.waitFor({ state: 'hidden' });
+    
+    await expect(this.inputCodigoVendedor).not.toHaveValue('');
+  }
+
+  async seleccionarMonedaPorNombre(nombreMoneda) {
+    await this.btnLupaMoneda.click();
+    await this.modalBuscarMoneda.waitFor({ state: 'visible' });
+    
+    await this.page.getByRole('cell', { name: nombreMoneda }).click();
+    await this.modalBuscarMoneda.waitFor({ state: 'hidden' });
+    
+    await expect(this.inputCodigoMoneda).not.toHaveValue('');
+  }
+
+async ingresarOtraDireccion(direccion) {
+    await this.selectDireccionEntrega.selectOption({ label: '--- Ingresar Otra Dirección ---' });
+    await this.inputOtraDireccion.fill(direccion);
+  }
+
+  async seleccionarArticuloPorNombre(nombreArticulo) {
+    await this.btnAgregarItem.click();
+    await this.btnLupaArticulo.click();
+    await this.modalBuscarArticulo.waitFor({ state: 'visible' });
+
+    await this.page.getByRole('cell', { name: nombreArticulo }).click();
+    await this.modalBuscarArticulo.waitFor({ state: 'hidden' });
+
+    await expect(this.inputCodigoArticulo).not.toHaveValue('');
+  }
+
+  async guardarYValidarExito() {
+    await this.btnGuardarFactura.click();
+    await expect(this.mensajeExito).toBeVisible();
   }
 }

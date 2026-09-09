@@ -7,6 +7,7 @@ export default defineConfig({
   use: {
     headless: false,
     screenshot: 'on',
+    baseURL: 'https://imcoarca.leonardojose.dev',
   },
   projects: [
     {
