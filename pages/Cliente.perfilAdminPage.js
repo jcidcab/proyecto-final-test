@@ -19,6 +19,10 @@ export class ClientePerfilAdminPage {
     });
     this.errorNombreRequerido = page.locator('text=Este campo es requerido');
     this.errorClienteExiste = page.locator('text=El cliente ya existe');
+
+
+    // Selector para la validación de campos obligatorios
+    this.mensajeCamposObligatorios = page.getByText('Cliente, Vendedor y Moneda son obligatorios.', { exact: true });
   }
 
   async navegarAClientes() {
@@ -95,4 +99,6 @@ export class ClientePerfilAdminPage {
     await this.btnGuardarCambios.scrollIntoViewIfNeeded();
     await this.btnGuardarCambios.click();
   }
+
+  
 }

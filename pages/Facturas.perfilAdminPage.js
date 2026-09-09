@@ -38,9 +38,12 @@ export class FacturasPerfilAdminPage {
     this.modalBuscarArticulo = page.locator('text=Buscar Artículo');
     this.inputCodigoArticulo = page.locator('tr').last().locator('input').first();
 
-    // Selector para el botón de guardar factura
+   // Selector para el botón de guardar factura y mensajes de validación
     this.btnGuardarFactura = page.getByRole('button', { name: /Guardar Factura/i });
     this.mensajeExito = page.getByText('Factura creada con éxito.', { exact: true });
+    this.mensajeCamposObligatorios = page.getByText('Cliente, Vendedor y Moneda son obligatorios.', { exact: true });
+   this.mensajeSinDireccion = page.getByText(/Debe especificar una Dirección/i);
+   this.sinProducto = page.getByText('Debe agregar un producto.', { exact: true });
   }
 
   async navegarAFacturasDeVenta() {
@@ -101,8 +104,28 @@ async ingresarOtraDireccion(direccion) {
     await expect(this.inputCodigoArticulo).not.toHaveValue('');
   }
 
+  async validarMensajeCamposObligatorios() {
+    await this.btnGuardarFactura.click();
+    await expect(this.mensajeCamposObligatorios).toBeVisible();
+  }
+
+    async guardarSinDireccion() {
+    await this.btnGuardarFactura.click();
+    await expect(this.mensajeSinDireccion).toBeVisible();
+  }
+
   async guardarYValidarExito() {
     await this.btnGuardarFactura.click();
     await expect(this.mensajeExito).toBeVisible();
   }
-}
+
+  async seleccionarOpcionOtraDireccion() {
+    await this.selectDireccionEntrega.selectOption({ label: '--- Ingresar Otra Dirección ---' });
+  }
+
+  async validarMensajeSinProducto() {
+    await this.btnGuardarFactura.click();
+    // Apuntamos directamente al contenedor del toast de error de Toastify
+    const toastError = this.page.locator('.Toastify__toast--error');
+    await expect(toastError).toBeVisible();
+}}
