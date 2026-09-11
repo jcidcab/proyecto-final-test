@@ -48,7 +48,7 @@ export class FacturasPerfilVendedorPage {
   async navegarAFacturasDeVenta() {
     await this.btnMenuModulo.click();
     await this.btnGestionClientes.click();
-    await this.subMenuItemFacturasVenta.waitFor({ state: 'visible', timeout: 10000 });
+    await this.subMenuItemFacturasVenta.waitFor({ state: 'visible' });
     await this.subMenuItemFacturasVenta.click();
   }
 

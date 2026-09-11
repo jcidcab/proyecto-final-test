@@ -21,4 +21,8 @@ exports.LoginPerfilVendedorPage = class LoginPerfilVendedorPage {
     await this.password.fill(clave);
     await this.btnIngresar.click();
   }
+
+    async cerrarSesion() {
+    await this.btnCerrarSesion.click();
+  }
 };

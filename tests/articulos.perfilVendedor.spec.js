@@ -1,0 +1,129 @@
+import { test, expect } from '@playwright/test';
+import { ArticulosPerfilVendedorPage } from '../pages/Articulos.PerfilVendedorPage.js';
+import { LoginPerfilVendedorPage } from '../pages/Login.perfilVendedorPage.js';
+
+
+test.describe('Módulo de Artículos - Perfil Administrador', () => {
+  let vendedorPage;
+  let articulosPage;
+
+  test.beforeEach(async ({ page }) => {
+    vendedorPage = new LoginPerfilVendedorPage(page);
+    articulosPage = new ArticulosPerfilVendedorPage(page);
+
+    await vendedorPage.abrirPagina();
+    await vendedorPage.iniciarSesion('vendedor@testing.com', 'Tae@2026');
+    await expect(page).toHaveURL(/.*\/dashboard/);
+    await articulosPage.navegarAArticulos();
+  });
+
+  test.afterEach(async ({ page }) => {
+    const VendedorPageClean = new LoginPerfilVendedorPage(page);
+    await VendedorPageClean.cerrarSesion();
+  });
+
+  test('1. Crear artículo con éxito', async ({ page }) => {
+   
+    const sku12Digitos = Math.floor(100000000000 + Math.random() * 900000000000).toString();
+
+    await articulosPage.IrACrearArticulo();
+    await articulosPage.SKU(sku12Digitos);
+    await articulosPage.nombreArticulo('Artículo de prueba');
+    await articulosPage.Linea('LINEA 1');
+    await articulosPage.Categoria('CATEGORIA 1');
+    await articulosPage.guardarCambios();
+
+    await articulosPage.MensajeArticuloCreado();
+  });
+
+
+  test('2. Crear artículo con SKU existente', async ({ page }) => {
+    const sku12Digitos = Math.floor(100000000000 + Math.random() * 900000000000).toString();
+
+    await articulosPage.IrACrearArticulo();
+    await articulosPage.SKU(sku12Digitos);
+    await articulosPage.nombreArticulo('Artículo de prueba');
+    await articulosPage.Linea('LINEA 1');
+    await articulosPage.Categoria('CATEGORIA 1');
+    await articulosPage.guardarCambios();
+    
+    await articulosPage.MensajeArticuloCreado();
+
+    await articulosPage.IrACrearArticulo();
+    await articulosPage.SKU(sku12Digitos); 
+    await articulosPage.nombreArticulo('Artículo repetido');
+    await articulosPage.Linea('LINEA 1');
+    await articulosPage.Categoria('CATEGORIA 1');
+    await articulosPage.guardarCambios();
+
+    await articulosPage.MensajeSkuExiste();
+  });
+
+  test('3. Crear artículo sin sku', async ({ page }) => {
+   
+    await articulosPage.IrACrearArticulo();
+    await articulosPage.nombreArticulo('Artículo de prueba');
+    await articulosPage.Linea('LINEA 1');
+    await articulosPage.Categoria('CATEGORIA 1');
+    await articulosPage.guardarCambios();
+
+    await articulosPage.msjSkuErroneo();
+  });
+
+  test('4. Crear artículo sin nombre', async ({ page }) => {
+
+     const sku12Digitos = Math.floor(100000000000 + Math.random() * 900000000000).toString();
+   
+    await articulosPage.IrACrearArticulo();
+    await articulosPage.SKU(sku12Digitos);
+    await articulosPage.Linea('LINEA 1');
+    await articulosPage.Categoria('CATEGORIA 1');
+    await articulosPage.guardarCambios();
+
+    await articulosPage.articuloSinNombre();
+  });
+
+   test('5. Crear artículo sin linea', async ({ page }) => {
+   
+    const sku12Digitos = Math.floor(100000000000 + Math.random() * 900000000000).toString();
+   
+    await articulosPage.IrACrearArticulo();
+    await articulosPage.SKU(sku12Digitos);
+    await articulosPage.nombreArticulo('Artículo de prueba');
+    await articulosPage.Categoria('CATEGORIA 1');
+    await articulosPage.guardarCambios();
+
+    await articulosPage.sinLinea();
+  });
+
+  test('5. Crear artículo sin ccategoria', async ({ page }) => {
+   
+    const sku12Digitos = Math.floor(100000000000 + Math.random() * 900000000000).toString();
+   
+    await articulosPage.IrACrearArticulo();
+    await articulosPage.SKU(sku12Digitos);
+    await articulosPage.nombreArticulo('Artículo de prueba');
+    await articulosPage.Linea('LINEA 1');
+    await articulosPage.guardarCambios();
+    
+    await articulosPage.sinCategoria();
+  });
+
+test('6. Crear artículo con descripcion', async ({ page }) => {
+  const sku12Digitos = Math.floor(100000000000 + Math.random() * 900000000000).toString();
+
+  await articulosPage.IrACrearArticulo();
+  await articulosPage.SKU(sku12Digitos);
+  await articulosPage.nombreArticulo('Artículo de prueba');
+  await articulosPage.descripcionArticulo('Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do');
+  await articulosPage.Linea('LINEA 1');
+  await articulosPage.Categoria('CATEGORIA 1');
+  await articulosPage.guardarCambios();
+
+  await articulosPage.MensajeArticuloCreado();
+});
+
+
+});
+
+

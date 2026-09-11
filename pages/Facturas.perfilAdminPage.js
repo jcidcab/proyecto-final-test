@@ -42,14 +42,15 @@ export class FacturasPerfilAdminPage {
     this.btnGuardarFactura = page.getByRole('button', { name: /Guardar Factura/i });
     this.mensajeExito = page.getByText('Factura creada con éxito.', { exact: true });
     this.mensajeCamposObligatorios = page.getByText('Cliente, Vendedor y Moneda son obligatorios.', { exact: true });
-   this.mensajeSinDireccion = page.getByText(/Debe especificar una Dirección/i);
-   this.sinProducto = page.getByText('Debe agregar un producto.', { exact: true });
+    this.mensajeSinDireccion = page.getByText(/Debe especificar una Dirección/i);
+    this.sinProducto = page.getByText('Debe agregar un producto.', { exact: true });
+    this.btnCerrarSesion = page.getByText('Cerrar Sesión', { exact: true });
   }
 
   async navegarAFacturasDeVenta() {
     await this.btnMenuModulo.click();
     await this.btnGestionClientes.click();
-    await this.subMenuItemFacturasVenta.waitFor({ state: 'visible', timeout: 10000 });
+    await this.subMenuItemFacturasVenta.waitFor({ state: 'visible'});
     await this.subMenuItemFacturasVenta.click();
   }
 
@@ -128,4 +129,18 @@ async ingresarOtraDireccion(direccion) {
     // Apuntamos directamente al contenedor del toast de error de Toastify
     const toastError = this.page.locator('.Toastify__toast--error');
     await expect(toastError).toBeVisible();
-}}
+}
+async abrirPagina() {
+    await this.page.goto('/login'); // Ajusta la ruta de tu login si es diferente
+  }
+
+  async iniciarSesion(email, password) {
+    // Tus métodos de login habituales...
+  }
+
+  async cerrarSesion() {
+    await this.btnCerrarSesion.click();
+  }
+
+
+}
