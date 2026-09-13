@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { LoginPerfilAdminPage } from '../pages/Login.perfilAdminPage.js';
 
-test('Entrar con credenciales correctas', async ({ page }) => {
+test('1. Entrar con credenciales correctas', async ({ page }) => {
   const adminPage = new LoginPerfilAdminPage(page);
 
   await adminPage.abrirPagina();
@@ -14,7 +14,7 @@ test('Entrar con credenciales correctas', async ({ page }) => {
   await expect(adminPage.btnCerrarSesion).toBeVisible();
 });
 
-test('Email incorrecto', async ({ page }) => {
+test('2. Email incorrecto', async ({ page }) => {
   const adminPage = new LoginPerfilAdminPage(page);
 
   await adminPage.abrirPagina();
@@ -23,7 +23,7 @@ test('Email incorrecto', async ({ page }) => {
   await expect(adminPage.alertaError).toBeVisible();
 });
 
-test('clave incorrecta', async ({ page }) => {
+test('3. clave incorrecta', async ({ page }) => {
   const adminPage = new LoginPerfilAdminPage(page);
 
   await adminPage.abrirPagina();

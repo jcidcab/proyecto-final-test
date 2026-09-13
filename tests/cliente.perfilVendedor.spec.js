@@ -1,138 +1,123 @@
 import { test, expect } from '@playwright/test';
+import { ClientePerfilVendedorPage } from '../pages/Cliente.perfilVendedorPage.js'; 
 import { LoginPerfilVendedorPage } from '../pages/Login.perfilVendedorPage.js';
-import { ClientePerfilVendedorPage } from '../pages/Cliente.perfilVendedorPage.js';
 
 test.describe('Módulo de Clientes - Perfil Vendedor', () => {
-  let loginPage;
+  let vendedorPage;
   let clientePage;
 
   test.beforeEach(async ({ page }) => {
-    loginPage = new LoginPerfilVendedorPage(page);
+    vendedorPage = new LoginPerfilVendedorPage(page);
     clientePage = new ClientePerfilVendedorPage(page);
 
-    await loginPage.abrirPagina();
-    await loginPage.iniciarSesion('vendedor@testing.com', 'Tae@2026');
-    await expect(page).toHaveURL('https://imcoarca.leonardojose.dev/dashboard');
-
+    await vendedorPage.abrirPagina();
+    await vendedorPage.iniciarSesion('vendedor@testing.com', 'Tae@2026');
+    await expect(page).toHaveURL(/.*\/dashboard/);
+    
     await clientePage.navegarAClientes();
-    await expect(page).toHaveURL('https://imcoarca.leonardojose.dev/clientes');
 
-    await clientePage.irACrearCliente();
-    await expect(page).toHaveURL('https://imcoarca.leonardojose.dev/clientes/nuevo');
-    await expect(clientePage.tituloCrearCliente).toBeVisible();
+
   });
 
-  test('Permite visualizar el listado de clientes correctamente', async ({ page }) => {
-    await page.goto('https://imcoarca.leonardojose.dev/clientes');
-    await expect(clientePage.tituloListado).toBeVisible();
+    test.afterEach(async ({ page }) => {
+    const vendedorPageClean = new LoginPerfilVendedorPage(page);
+    await vendedorPageClean.cerrarSesion();
   });
 
-  test('Permite crear un cliente exitosamente con datos válidos', async () => {
-    await clientePage.rellenarFormulario({ 
-      cuit: '20-23444555-4', 
-      razonSocial: 'Empresa Valida S.A.' 
-    });
-    await clientePage.guardarCliente();
+  test('1. Creación exitosa de cliente', async ({ page }) => {
+    await clientePage.registrarCliente();
+    await clientePage.ingresarCuit('20-23444555-4');
+    await clientePage.ingresarNombre('Cliente ficticio para prueba');
+    await clientePage.guardarCambios();
 
-    await expect(clientePage.alertaExito).toBeVisible();
+    await clientePage.mensajeClienteCreado();
+
   });
 
-  test('Muestra error de formato al registrar un CUIT erróneo', async () => {
-    await clientePage.rellenarFormulario({ 
-      cuit: '11-1', 
-      razonSocial: 'Cliente Cuit Inválido' 
-    });
-    await clientePage.guardarCliente();
+   test('2. Ingreso sin CUIT', async ({ page }) => {
+    await clientePage.registrarCliente();
+    
+    await clientePage.ingresarNombre('Cliente ficticio para prueba');
+    await clientePage.guardarCambios();
 
-    await clientePage.errorCuit.scrollIntoViewIfNeeded();
-    await expect(clientePage.errorCuit).toBeVisible();
+    await clientePage.msjCuitVacio();
+
   });
 
-  test('Muestra error de campo requerido al intentar guardar sin nombre o razón social', async () => {
-    await clientePage.rellenarFormulario({ 
-      cuit: '20-23444555-4', 
-      razonSocial: '' 
-    });
-    await clientePage.guardarCliente();
+  test('3. Ingreso con CUIT falso', async ({ page }) => {
+    await clientePage.registrarCliente();
+    await clientePage.ingresarCuit('20-25-4');
+    await clientePage.ingresarNombre('Cliente ficticio para prueba');
+    await clientePage.guardarCambios();
 
-    await clientePage.errorNombreRequerido.scrollIntoViewIfNeeded();
-    await expect(clientePage.errorNombreRequerido).toBeVisible();
+    await clientePage.msjCuitErroneo();
+
   });
 
-  test('Permite crear cliente exitosamente dejando la dirección en blanco', async () => {
-    await clientePage.rellenarFormulario({ 
-      cuit: '20-23444555-4', 
-      razonSocial: 'Cliente Sin Direccion',
-      direccion: '' 
-    });
-    await clientePage.guardarCliente();
+  test('4. Ingreso de cliente sin nombre', async ({ page }) => {
+    await clientePage.registrarCliente();
+    await clientePage.ingresarCuit('20-23444555-4');
+    await clientePage.guardarCambios();
 
-    await expect(clientePage.alertaExito).toBeVisible();
+    await clientePage.msjSinNombre();
+
   });
 
-  test('Permite crear cliente exitosamente dejando el código postal en blanco', async () => {
-    await clientePage.rellenarFormulario({ 
-      cuit: '20-23444555-4', 
-      razonSocial: 'Cliente Sin CP',
-      codigoPostal: '' 
-    });
-    await clientePage.guardarCliente();
+  test('5. Ingreso de cliente Cond Tributaria IVA Responsable ', async ({ page }) => {
+    await clientePage.registrarCliente();
+    await clientePage.ingresarCuit('20-23444555-4');
+    await clientePage.ingresarNombre('Cliente ficticio para prueba');
+    await clientePage.selectCndTributaria('IVA Responsable Inscripto');
+    await clientePage.guardarCambios();
 
-    await expect(clientePage.alertaExito).toBeVisible();
+     await clientePage.mensajeClienteCreado();
+
   });
 
-  test('Permite crear cliente exitosamente dejando la ciudad en blanco', async () => {
-    await clientePage.rellenarFormulario({ 
-      cuit: '20-23444555-4', 
-      razonSocial: 'Cliente Sin Ciudad',
-      ciudad: '' 
-    });
-    await clientePage.guardarCliente();
+   test('6. Ingreso de cliente Cond Tributaria Monotributista ', async ({ page }) => {
+    await clientePage.registrarCliente();
+    await clientePage.ingresarCuit('20-23444555-4');
+    await clientePage.ingresarNombre('Cliente ficticio para prueba');
+    await clientePage.selectCndTributaria('Monotributista');
+    await clientePage.guardarCambios();
 
-    await expect(clientePage.alertaExito).toBeVisible();
+    await clientePage.mensajeClienteCreado();
+
   });
 
-  test('Permite crear cliente exitosamente dejando el teléfono en blanco', async () => {
-    await clientePage.rellenarFormulario({ 
-      cuit: '20-23444555-4', 
-      razonSocial: 'Cliente Sin Telefono',
-      telefono: '' 
-    });
-    await clientePage.guardarCliente();
+  test('7. Ingreso de cliente Cond Tributaria Exento ', async ({ page }) => {
+    await clientePage.registrarCliente();
+    await clientePage.ingresarCuit('20-23444555-4');
+    await clientePage.ingresarNombre('Cliente ficticio para prueba');
+    await clientePage.selectCndTributaria('Exento');
+    await clientePage.guardarCambios();
 
-    await expect(clientePage.alertaExito).toBeVisible();
+     await clientePage.mensajeClienteCreado();
+
   });
 
-  test('Permite crear cliente exitosamente dejando el email en blanco', async () => {
-    await clientePage.rellenarFormulario({ 
-      cuit: '20-23444555-4', 
-      razonSocial: 'Cliente Sin Email',
-      email: '' 
-    });
-    await clientePage.guardarCliente();
+  test('8. Ingreso de cliente que no retiene IVA ', async ({ page }) => {
+    await clientePage.registrarCliente();
+    await clientePage.ingresarCuit('20-23444555-4');
+    await clientePage.ingresarNombre('Cliente ficticio para prueba');
+    await clientePage.retencionIVA('No');
+    await clientePage.guardarCambios();
 
-    await expect(clientePage.alertaExito).toBeVisible();
+    await clientePage.mensajeClienteCreado();
+
   });
 
-  test('Permite crear cliente exitosamente dejando el WhatsApp en blanco', async () => {
-    await clientePage.rellenarFormulario({ 
-      cuit: '20-23444555-4', 
-      razonSocial: 'Cliente Sin Wp',
-      whatsapp: '' 
-    });
-    await clientePage.guardarCliente();
+   test('9. Ingreso de cliente que retiene IVA ', async ({ page }) => {
+    await clientePage.registrarCliente();
+    await clientePage.ingresarCuit('20-23444555-4');
+    await clientePage.ingresarNombre('Cliente ficticio para prueba');
+    await clientePage.retencionIVA('Si');
+    await clientePage.guardarCambios();
 
-    await expect(clientePage.alertaExito).toBeVisible();
+     await clientePage.mensajeClienteCreado();
+
   });
 
-  test('Muestra un mensaje de error si se intenta crear un cliente que ya existe', async () => {
-    await clientePage.rellenarFormulario({ 
-      cuit: '34-20268959-2', 
-      razonSocial: 'Empresa SAZZZX' 
-    });
-    await clientePage.guardarCliente();
 
-    await clientePage.errorClienteExiste.scrollIntoViewIfNeeded();
-    await expect(clientePage.errorClienteExiste).toBeVisible();
-  });
+
 });

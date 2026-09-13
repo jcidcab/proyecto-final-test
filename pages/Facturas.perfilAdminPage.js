@@ -45,6 +45,7 @@ export class FacturasPerfilAdminPage {
     this.mensajeSinDireccion = page.getByText(/Debe especificar una Dirección/i);
     this.sinProducto = page.getByText('Debe agregar un producto.', { exact: true });
     this.btnCerrarSesion = page.getByText('Cerrar Sesión', { exact: true });
+    
   }
 
   async navegarAFacturasDeVenta() {

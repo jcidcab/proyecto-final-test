@@ -1,4 +1,4 @@
-exports.LoginPerfilVendedorPage = class LoginPerfilVendedorPage {
+export class LoginPerfilVendedorPage {
   constructor(page) {
     this.page = page;
     
@@ -9,6 +9,7 @@ exports.LoginPerfilVendedorPage = class LoginPerfilVendedorPage {
     this.tituloDashboard = page.getByRole('heading', { name: 'Dashboard' });
     this.textoBienvenida = page.locator('text=Bienvenido al sistema ERP.');
     this.btnCerrarSesion = page.getByRole('button', { name: 'Cerrar Sesión' });
+    
     this.alertaError = page.locator('text=Las credenciales proporcionadas son incorrectas.');
   }
 
@@ -22,7 +23,7 @@ exports.LoginPerfilVendedorPage = class LoginPerfilVendedorPage {
     await this.btnIngresar.click();
   }
 
-    async cerrarSesion() {
+  async cerrarSesion() {
     await this.btnCerrarSesion.click();
   }
-};
+}
